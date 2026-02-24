@@ -1,0 +1,5 @@
+.idea/
+vendor/
+logs/*.log
+!logs/.gitkeep
+composer.lock
