@@ -29,12 +29,6 @@ Then open [http://localhost:8000](http://localhost:8000) in your browser.
 
 The project uses a simple SQLite database for authentication.
 
-### Default User
-
-A default user is created automatically:
-- **Email:** `brian@olsfamily.com`
-- **Password:** `tacos123`
-
 ### Managing Users via CLI
 
 You can manage users in the database using the provided CLI scripts in the `bin/` directory.

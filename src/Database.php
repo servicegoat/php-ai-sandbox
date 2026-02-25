@@ -96,15 +96,6 @@ class Database
                 }
             }
         }
-
-        // Seed default user if not exists
-        $stmt = self::$pdo->prepare("SELECT COUNT(*) FROM users WHERE email = ?");
-        $stmt->execute(['brian@olsfamily.com']);
-        if ($stmt->fetchColumn() == 0) {
-            $hashedPassword = password_hash('tacos123', PASSWORD_BCRYPT);
-            $stmt = self::$pdo->prepare("INSERT INTO users (id, email, password) VALUES (?, ?, ?)");
-            $stmt->execute([self::generateUuid(), 'brian@olsfamily.com', $hashedPassword]);
-        }
     }
 
     public static function generateUuid(): string
