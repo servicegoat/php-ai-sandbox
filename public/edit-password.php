@@ -12,10 +12,13 @@ $error = '';
 $success = '';
 
 if ($_SERVER['REQUEST_METHOD'] === 'POST') {
+    $currentPassword = $_POST['current_password'] ?? '';
     $newPassword = $_POST['new_password'] ?? '';
     $confirmPassword = $_POST['confirm_password'] ?? '';
 
-    if (empty($newPassword)) {
+    if (empty($currentPassword)) {
+        $error = 'Current password is required.';
+    } elseif (empty($newPassword)) {
         $error = 'New password is required.';
     } elseif (strlen($newPassword) > 255) {
         $error = 'Password must be no longer than 255 characters.';
@@ -24,14 +27,24 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     } else {
         try {
             $pdo = Database::getConnection();
-            $hashedPassword = password_hash($newPassword, PASSWORD_BCRYPT);
             $id = AuthService::getCurrentUserUuid();
-            
-            $stmt = $pdo->prepare("UPDATE users SET password = ? WHERE id = ?");
-            $stmt->execute([$hashedPassword, $id]);
-            
-            $success = 'Password updated successfully.';
-            LoggerService::getLogger()->info("User changed their password: $id");
+
+            // Verify current password
+            $stmt = $pdo->prepare("SELECT password FROM users WHERE id = ?");
+            $stmt->execute([$id]);
+            $user = $stmt->fetch();
+
+            if (!$user || !password_verify($currentPassword, $user['password'])) {
+                $error = 'Current password is incorrect.';
+                LoggerService::getLogger()->warning("Failed password change attempt (incorrect current password) for user: $id");
+            } else {
+                $hashedPassword = password_hash($newPassword, PASSWORD_BCRYPT);
+                $stmt = $pdo->prepare("UPDATE users SET password = ? WHERE id = ?");
+                $stmt->execute([$hashedPassword, $id]);
+                
+                $success = 'Password updated successfully.';
+                LoggerService::getLogger()->info("User changed their password: $id");
+            }
         } catch (Exception $e) {
             $error = 'An error occurred. Please try again.';
             LoggerService::getLogger()->error("Error changing password for user " . AuthService::getCurrentUserUuid() . ": " . $e->getMessage());
@@ -63,6 +76,9 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         <p>User: <?php echo htmlspecialchars($_SESSION['user_email'], ENT_QUOTES, 'UTF-8'); ?></p>
         
         <form method="post" action="">
+            <label for="current_password">Current Password:</label>
+            <input type="password" id="current_password" name="current_password" required>
+
             <label for="new_password">New Password:</label>
             <input type="password" id="new_password" name="new_password" maxlength="255" required>
             
