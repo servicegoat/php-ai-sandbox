@@ -1,0 +1,99 @@
+/* General styles */
+body {
+    font-family: Arial, sans-serif;
+    margin: 24px;
+}
+
+label {
+    display: block;
+    margin-bottom: 8px;
+}
+
+input[type="text"],
+input[type="email"],
+input[type="password"] {
+    padding: 8px;
+    box-sizing: border-box;
+}
+
+button {
+    padding: 8px 12px;
+    cursor: pointer;
+}
+
+.error {
+    color: #b00020;
+    margin-top: 12px;
+    font-size: 14px;
+}
+
+.success {
+    color: #28a745;
+    margin-top: 12px;
+    font-size: 14px;
+}
+
+/* Container and layout */
+.container, .login-container {
+    max-width: 400px;
+    margin: auto;
+    border: 1px solid #e5e7eb;
+    padding: 24px;
+    border-radius: 8px;
+    background: #f6f8fa;
+}
+
+.login-container {
+    width: 320px;
+}
+
+.login-page {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    height: 80vh;
+}
+
+h1 {
+    margin-top: 0;
+    font-size: 24px;
+}
+
+.nav {
+    margin-top: 20px;
+}
+
+.primes-nav {
+    margin-bottom: 20px;
+}
+
+/* Page specific */
+/* Primes page */
+input[id="n"] {
+    width: 240px;
+}
+
+.result {
+    margin-top: 18px;
+}
+
+.primes {
+    margin-top: 10px;
+    padding: 12px;
+    background: #f6f8fa;
+    border: 1px solid #e5e7eb;
+}
+
+/* Edit password & Login page adjustments */
+.container label, .login-container label {
+    margin-top: 16px;
+}
+
+.container input, .login-container input,
+.container button, .login-container button {
+    width: 100%;
+}
+
+.container button, .login-container button {
+    margin-top: 20px;
+}

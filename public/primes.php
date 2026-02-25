@@ -79,20 +79,12 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 <head>
     <meta charset="utf-8">
     <title>Prime Numbers</title>
-    <style>
-        body { font-family: Arial, sans-serif; margin: 24px; }
-        label { display: block; margin-bottom: 8px; }
-        input[type="text"] { padding: 8px; width: 240px; }
-        button { padding: 8px 12px; margin-top: 10px; }
-        .error { color: #b00020; margin-top: 12px; }
-        .result { margin-top: 18px; }
-        .primes { margin-top: 10px; padding: 12px; background: #f6f8fa; border: 1px solid #e5e7eb; }
-    </style>
+    <link rel="stylesheet" href="css/style.css">
 </head>
 <body>
     <h1>Prime Numbers Up To N</h1>
 
-    <div style="margin-bottom: 20px;">
+    <div class="primes-nav">
         Logged in as: <strong><?php echo htmlspecialchars($_SESSION['user_email'], ENT_QUOTES, 'UTF-8'); ?></strong> | 
         <a href="edit-password.php">Change Password</a> |
         <a href="logout.php">Logout</a>
@@ -110,9 +102,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             required
             value="<?php echo htmlspecialchars($input, ENT_QUOTES, 'UTF-8'); ?>"
         >
-        <div>
-            <button type="submit">Show primes</button>
-        </div>
+        <button type="submit" style="margin-top: 10px;">Show primes</button>
         <div id="clientError" class="error" style="display:none;"></div>
     </form>
 

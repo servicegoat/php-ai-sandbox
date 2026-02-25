@@ -44,17 +44,9 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 <head>
     <meta charset="utf-8">
     <title>Login</title>
-    <style>
-        body { font-family: Arial, sans-serif; margin: 24px; display: flex; justify-content: center; align-items: center; height: 80vh; }
-        .login-container { border: 1px solid #e5e7eb; padding: 24px; border-radius: 8px; background: #f6f8fa; width: 320px; }
-        h1 { margin-top: 0; font-size: 24px; }
-        label { display: block; margin-bottom: 8px; margin-top: 16px; }
-        input[type="email"], input[type="password"] { padding: 8px; width: 100%; box-sizing: border-box; }
-        button { padding: 8px 12px; margin-top: 20px; width: 100%; cursor: pointer; }
-        .error { color: #b00020; margin-top: 12px; font-size: 14px; }
-    </style>
+    <link rel="stylesheet" href="css/style.css">
 </head>
-<body>
+<body class="login-page">
     <div class="login-container">
         <h1>Login</h1>
         <form method="post" action="">
