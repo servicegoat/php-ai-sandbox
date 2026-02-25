@@ -8,7 +8,7 @@ class AuthService
 {
     public static function startSession(): void
     {
-        if (session_status() === PHP_SESSION_NONE) {
+        if (session_status() === PHP_SESSION_NONE && !headers_sent()) {
             session_start();
         }
     }
@@ -34,7 +34,10 @@ class AuthService
     public static function logout(): void
     {
         self::startSession();
-        session_destroy();
+        if (session_status() === PHP_SESSION_ACTIVE) {
+            session_destroy();
+        }
+        $_SESSION = [];
     }
 
     public static function isAuthenticated(): bool
