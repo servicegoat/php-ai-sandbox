@@ -28,8 +28,8 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         $error = 'Password is required.';
     } else {
         if (AuthService::login($email, $password)) {
-            $uuid = AuthService::getCurrentUserUuid();
-            LoggerService::getLogger()->info("User logged in: $uuid");
+            $id = AuthService::getCurrentUserUuid();
+            LoggerService::getLogger()->info("User logged in: $id");
             header('Location: /primes.php');
             exit;
         } else {

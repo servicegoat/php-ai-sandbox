@@ -47,18 +47,18 @@ php bin/add-user.php <email> <password>
 
 #### Editing a User Password
 
-You can update a user's password by providing their email, ID, or UUID.
+You can update a user's password by providing their email or ID (UUID).
 
 ```bash
-php bin/edit-user.php <email_or_id_or_uuid> <new_password>
+php bin/edit-user.php <email_or_id> <new_password>
 ```
 
 #### Deleting a User
 
-You can delete a user by providing their email, ID, or UUID.
+You can delete a user by providing their email or ID (UUID).
 
 ```bash
-php bin/delete-user.php <email_or_id_or_uuid>
+php bin/delete-user.php <email_or_id>
 ```
 
 **Validation Rules:**
@@ -67,7 +67,7 @@ php bin/delete-user.php <email_or_id_or_uuid>
 
 ### Logging
 
-To protect user privacy, logs do not contain user emails. Instead, they use a unique UUID generated for each user.
+To protect user privacy, logs do not contain user emails. Instead, they use the unique ID (UUID) generated for each user.
 
 ## Running Tests
 

@@ -36,40 +36,64 @@ class Database
         if (!$tableExists) {
             self::$pdo->exec("
                 CREATE TABLE users (
-                    id INTEGER PRIMARY KEY AUTOINCREMENT,
-                    uuid TEXT NOT NULL UNIQUE,
+                    id TEXT PRIMARY KEY,
                     email TEXT NOT NULL UNIQUE,
                     password TEXT NOT NULL,
                     created_at DATETIME DEFAULT CURRENT_TIMESTAMP
                 )
             ");
         } else {
-            // Check if uuid column exists
+            // Check if schema needs update (id column type)
             $result = self::$pdo->query("PRAGMA table_info(users)");
             $columns = $result->fetchAll();
-            $uuidExists = false;
+            $idType = '';
+            $hasUuid = false;
             foreach ($columns as $column) {
+                if ($column['name'] === 'id') {
+                    $idType = strtoupper($column['type']);
+                }
                 if ($column['name'] === 'uuid') {
-                    $uuidExists = true;
-                    break;
+                    $hasUuid = true;
                 }
             }
 
-            if (!$uuidExists) {
-                self::$pdo->exec("ALTER TABLE users ADD COLUMN uuid TEXT");
-                
-                // Populate existing users with UUIDs
-                $stmt = self::$pdo->query("SELECT id FROM users WHERE uuid IS NULL");
-                $users = $stmt->fetchAll();
-                $updateStmt = self::$pdo->prepare("UPDATE users SET uuid = ? WHERE id = ?");
-                foreach ($users as $user) {
-                    $updateStmt->execute([self::generateUuid(), $user['id']]);
-                }
+            if ($idType === 'INTEGER') {
+                // Migration: INTEGER id -> TEXT uuid-based id
+                self::$pdo->beginTransaction();
+                try {
+                    // 1. Create new table
+                    self::$pdo->exec("
+                        CREATE TABLE users_new (
+                            id TEXT PRIMARY KEY,
+                            email TEXT NOT NULL UNIQUE,
+                            password TEXT NOT NULL,
+                            created_at DATETIME DEFAULT CURRENT_TIMESTAMP
+                        )
+                    ");
 
-                // Make uuid column NOT NULL UNIQUE (SQLite doesn't support ALTER COLUMN easily, 
-                // but since we just populated it, it's effectively fine for now if we don't strictly enforce it via schema change here, 
-                // or we could do the temp table dance. Given it's a sandbox, simple ALTER + manual populate is a start.)
-                // To properly add UNIQUE constraint in SQLite we need a new table.
+                    // 2. Copy data
+                    if ($hasUuid) {
+                        // If we have uuid column, use it as new id
+                        self::$pdo->exec("INSERT INTO users_new (id, email, password, created_at) SELECT uuid, email, password, created_at FROM users");
+                    } else {
+                        // If no uuid, we'll need to generate them (shouldn't happen based on previous history but safe)
+                        $stmt = self::$pdo->query("SELECT * FROM users");
+                        $users = $stmt->fetchAll();
+                        $insertStmt = self::$pdo->prepare("INSERT INTO users_new (id, email, password, created_at) VALUES (?, ?, ?, ?)");
+                        foreach ($users as $user) {
+                            $insertStmt->execute([self::generateUuid(), $user['email'], $user['password'], $user['created_at']]);
+                        }
+                    }
+
+                    // 3. Swap tables
+                    self::$pdo->exec("DROP TABLE users");
+                    self::$pdo->exec("ALTER TABLE users_new RENAME TO users");
+
+                    self::$pdo->commit();
+                } catch (\Exception $e) {
+                    self::$pdo->rollBack();
+                    throw $e;
+                }
             }
         }
 
@@ -78,20 +102,18 @@ class Database
         $stmt->execute(['brian@olsfamily.com']);
         if ($stmt->fetchColumn() == 0) {
             $hashedPassword = password_hash('tacos123', PASSWORD_BCRYPT);
-            $stmt = self::$pdo->prepare("INSERT INTO users (uuid, email, password) VALUES (?, ?, ?)");
+            $stmt = self::$pdo->prepare("INSERT INTO users (id, email, password) VALUES (?, ?, ?)");
             $stmt->execute([self::generateUuid(), 'brian@olsfamily.com', $hashedPassword]);
         }
     }
 
     public static function generateUuid(): string
     {
-        return sprintf(
-            '%04x%04x-%04x-%04x-%04x-%04x%04x%04x',
-            mt_rand(0, 0xffff), mt_rand(0, 0xffff),
-            mt_rand(0, 0xffff),
-            mt_rand(0, 0x0fff) | 0x4000,
-            mt_rand(0, 0x3fff) | 0x8000,
-            mt_rand(0, 0xffff), mt_rand(0, 0xffff), mt_rand(0, 0xffff)
-        );
+        // v4 UUID: xxxxxxxx-xxxx-4xxx-yxxx-xxxxxxxxxxxx where y is one of 8, 9, A, or B
+        $data = random_bytes(16);
+        $data[6] = chr(ord($data[6]) & 0x0f | 0x40); // set version to 0100 (4)
+        $data[8] = chr(ord($data[8]) & 0x3f | 0x80); // set bits 6-7 to 10
+
+        return vsprintf('%s%s-%s-%s-%s-%s%s%s', str_split(bin2hex($data), 4));
     }
 }

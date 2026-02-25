@@ -20,9 +20,9 @@ if (strlen($newPassword) > 255) {
 try {
     $pdo = Database::getConnection();
     
-    // Find user by email, ID, or UUID
-    $stmt = $pdo->prepare("SELECT id, email, uuid FROM users WHERE email = ? OR id = ? OR uuid = ?");
-    $stmt->execute([$identifier, $identifier, $identifier]);
+    // Find user by email or ID (UUID)
+    $stmt = $pdo->prepare("SELECT id, email FROM users WHERE email = ? OR id = ?");
+    $stmt->execute([$identifier, $identifier]);
     $user = $stmt->fetch();
 
     if (!$user) {
@@ -34,7 +34,7 @@ try {
     $stmt = $pdo->prepare("UPDATE users SET password = ? WHERE id = ?");
     $stmt->execute([$hashedPassword, $user['id']]);
 
-    echo "Password updated successfully for user: " . $user['email'] . " (UUID: " . $user['uuid'] . ")\n";
+    echo "Password updated successfully for user: " . $user['email'] . " (ID: " . $user['id'] . ")\n";
 } catch (Exception $e) {
     echo "Error: " . $e->getMessage() . "\n";
     exit(1);

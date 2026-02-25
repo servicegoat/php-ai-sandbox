@@ -14,9 +14,9 @@ $identifier = $argv[1];
 try {
     $pdo = Database::getConnection();
     
-    // Find user by email, ID, or UUID
-    $stmt = $pdo->prepare("SELECT id, email, uuid FROM users WHERE email = ? OR id = ? OR uuid = ?");
-    $stmt->execute([$identifier, $identifier, $identifier]);
+    // Find user by email or ID (UUID)
+    $stmt = $pdo->prepare("SELECT id, email FROM users WHERE email = ? OR id = ?");
+    $stmt->execute([$identifier, $identifier]);
     $user = $stmt->fetch();
 
     if (!$user) {
@@ -27,7 +27,7 @@ try {
     $stmt = $pdo->prepare("DELETE FROM users WHERE id = ?");
     $stmt->execute([$user['id']]);
 
-    echo "User deleted successfully: " . $user['email'] . " (UUID: " . $user['uuid'] . ")\n";
+    echo "User deleted successfully: " . $user['email'] . " (ID: " . $user['id'] . ")\n";
 } catch (Exception $e) {
     echo "Error: " . $e->getMessage() . "\n";
     exit(1);

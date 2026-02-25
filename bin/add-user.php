@@ -34,11 +34,11 @@ try {
     }
 
     $hashedPassword = password_hash($password, PASSWORD_BCRYPT);
-    $uuid = Database::generateUuid();
-    $stmt = $pdo->prepare("INSERT INTO users (uuid, email, password) VALUES (?, ?, ?)");
-    $stmt->execute([$uuid, $email, $hashedPassword]);
+    $id = Database::generateUuid();
+    $stmt = $pdo->prepare("INSERT INTO users (id, email, password) VALUES (?, ?, ?)");
+    $stmt->execute([$id, $email, $hashedPassword]);
 
-    echo "User $email added successfully with UUID: $uuid\n";
+    echo "User $email added successfully with UUID: $id\n";
 } catch (Exception $e) {
     echo "Error: " . $e->getMessage() . "\n";
     exit(1);

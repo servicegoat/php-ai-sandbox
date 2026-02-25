@@ -25,13 +25,13 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         try {
             $pdo = Database::getConnection();
             $hashedPassword = password_hash($newPassword, PASSWORD_BCRYPT);
-            $uuid = AuthService::getCurrentUserUuid();
+            $id = AuthService::getCurrentUserUuid();
             
-            $stmt = $pdo->prepare("UPDATE users SET password = ? WHERE uuid = ?");
-            $stmt->execute([$hashedPassword, $uuid]);
+            $stmt = $pdo->prepare("UPDATE users SET password = ? WHERE id = ?");
+            $stmt->execute([$hashedPassword, $id]);
             
             $success = 'Password updated successfully.';
-            LoggerService::getLogger()->info("User changed their password: $uuid");
+            LoggerService::getLogger()->info("User changed their password: $id");
         } catch (Exception $e) {
             $error = 'An error occurred. Please try again.';
             LoggerService::getLogger()->error("Error changing password for user " . AuthService::getCurrentUserUuid() . ": " . $e->getMessage());

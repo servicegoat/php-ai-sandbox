@@ -24,7 +24,6 @@ class AuthService
 
         if ($user && password_verify($password, $user['password'])) {
             $_SESSION['user_id'] = $user['id'];
-            $_SESSION['user_uuid'] = $user['uuid'];
             $_SESSION['user_email'] = $user['email'];
             return true;
         }
@@ -55,6 +54,6 @@ class AuthService
     public static function getCurrentUserUuid(): ?string
     {
         self::startSession();
-        return $_SESSION['user_uuid'] ?? null;
+        return $_SESSION['user_id'] ?? null;
     }
 }
