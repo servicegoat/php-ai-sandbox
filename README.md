@@ -35,22 +35,39 @@ A default user is created automatically:
 - **Email:** `brian@olsfamily.com`
 - **Password:** `tacos123`
 
-### Adding a Test User
+### Managing Users via CLI
 
-You can add new users to the database using the provided CLI script:
+You can manage users in the database using the provided CLI scripts in the `bin/` directory.
+
+#### Adding a User
 
 ```bash
 php bin/add-user.php <email> <password>
 ```
 
-**Example:**
+#### Editing a User Password
+
+You can update a user's password by providing their email, ID, or UUID.
+
 ```bash
-php bin/add-user.php john@example.com mysecurepassword
+php bin/edit-user.php <email_or_id_or_uuid> <new_password>
+```
+
+#### Deleting a User
+
+You can delete a user by providing their email, ID, or UUID.
+
+```bash
+php bin/delete-user.php <email_or_id_or_uuid>
 ```
 
 **Validation Rules:**
 - Username must be a valid email address.
 - Password must be no longer than 255 characters.
+
+### Logging
+
+To protect user privacy, logs do not contain user emails. Instead, they use a unique UUID generated for each user.
 
 ## Running Tests
 

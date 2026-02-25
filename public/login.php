@@ -28,12 +28,13 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         $error = 'Password is required.';
     } else {
         if (AuthService::login($email, $password)) {
-            LoggerService::getLogger()->info("User logged in: $email");
+            $uuid = AuthService::getCurrentUserUuid();
+            LoggerService::getLogger()->info("User logged in: $uuid");
             header('Location: /primes.php');
             exit;
         } else {
             $error = 'Invalid email or password.';
-            LoggerService::getLogger()->warning("Failed login attempt for email: $email");
+            LoggerService::getLogger()->warning("Failed login attempt for email: [REDACTED]");
         }
     }
 }
